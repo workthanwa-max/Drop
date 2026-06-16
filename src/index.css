@@ -1,0 +1,87 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+
+:root {
+  --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    'Segoe UI', sans-serif;
+
+  /* legacy tokens remapped to new cream/brown theme */
+  --bg-cream: #FFF8F0;
+  --panel-cream: #F8F4EC;
+  --accent-brown: #8B5E3C;
+  --accent-brown-2: #5C3A26;
+  --muted-grey: #E6E4E1;
+  --text-dark: #3A2F2A;
+  --muted-text: #767171;
+
+  /* keep old token names for compatibility with existing App.css that reference them */
+  --scanner-cyan: var(--accent-brown);
+  --scanner-cyan-glow: rgba(139,94,60,0.12);
+  --bio-hazard-red: #ff6b6b; /* kept for warnings */
+  --pulse-green: #3ddc97;
+  --deep-void-navy: var(--text-dark);
+  --holo-glass: rgba(248,244,236,0.92);
+  --holo-border: rgba(139,94,60,0.12);
+
+  /* layout / effect tokens */
+  --radius: 12px;
+  --shadow: 0 8px 24px rgba(58,47,42,0.06);
+  --shadow-strong: 0 24px 80px rgba(58,47,42,0.08);
+  --transition-fast: 180ms cubic-bezier(.2,.9,.3,1);
+
+  font-family: var(--font-sans);
+  color: var(--text-dark);
+  background: var(--bg-cream);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+  background: var(--bg-cream);
+}
+
+body {
+  min-width: 320px;
+  min-height: 100svh;
+  margin: 0;
+  color: var(--text-dark);
+  background: var(--bg-cream);
+  line-height: 1.45;
+  font-family: var(--font-sans);
+}
+
+/* Utility layout container */
+.container {
+  width: min(1200px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+/* Card / panel helper matching theme */
+.card {
+  background: var(--panel-cream);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px;
+  color: var(--text-dark);
+}
+
+/* Accessible focus for interactive elements */
+button, [role="button"], a {
+  transition: all var(--transition-fast);
+}
+
+button:focus-visible, [role="button"]:focus-visible, a:focus-visible {
+  outline: 3px solid rgba(139,94,60,0.14);
+  outline-offset: 3px;
+}
+
+/* Small utilities */
+.muted { color: var(--muted-text); }
+.lead { font-size: 1.05rem; color: var(--text-dark); }
