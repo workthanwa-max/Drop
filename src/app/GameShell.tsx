@@ -53,6 +53,33 @@ export function GameShell() {
   const visionRef = useRef<VisionHandler | null>(null)
   const engineRef = useRef<GameEngine | null>(null)
   const readyStartedAtRef = useRef(0)
+  const bgmRef = useRef<HTMLAudioElement | null>(null)
+
+  useEffect(() => {
+    const audio = new Audio('/bgm.mp3')
+    audio.loop = true
+    audio.volume = 0.4
+    bgmRef.current = audio
+
+    return () => {
+      audio.pause()
+      audio.src = ''
+      bgmRef.current = null
+    }
+  }, [])
+
+  useEffect(() => {
+    const audio = bgmRef.current
+    if (!audio) return
+
+    if (phase === 'playing') {
+      audio.pause()
+    } else {
+      audio.play().catch(() => {
+        // Ignore autoplay restriction before first user interaction
+      })
+    }
+  }, [phase])
 
   function cleanupSession(updateState = true) {
     engineRef.current?.dispose()

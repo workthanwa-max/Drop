@@ -566,26 +566,54 @@ export class GameEngine {
     const ctx = this.initAudio()
     if (!ctx) return
     try {
-      const oscillator = ctx.createOscillator()
-      const gainNode = ctx.createGain()
-
       const baseFreq = 440 // A4
       const steps = [0, 2, 4, 7, 9, 12, 14, 16, 19, 21, 24] // Major pentatonic
       const stepIndex = Math.min(Math.max(0, combo - 1), steps.length - 1)
       const freq = baseFreq * Math.pow(2, steps[stepIndex] / 12)
 
-      oscillator.type = 'sine'
-      oscillator.frequency.setValueAtTime(freq, ctx.currentTime)
+      // A grander, "level-up" style arpeggio: Root, Fifth, Octave, Major Tenth
+      const notes = [
+        freq, 
+        freq * Math.pow(2, 7 / 12), 
+        freq * Math.pow(2, 12 / 12), 
+        freq * Math.pow(2, 16 / 12)
+      ]
+      const noteDuration = 0.04
 
-      gainNode.gain.setValueAtTime(0, ctx.currentTime)
-      gainNode.gain.linearRampToValueAtTime(0.2, ctx.currentTime + 0.01)
-      gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15)
+      notes.forEach((noteFreq, i) => {
+        const osc1 = ctx.createOscillator()
+        const osc2 = ctx.createOscillator() // Second oscillator adds richness and sparkle
+        const gainNode = ctx.createGain()
+        
+        osc1.type = 'triangle'
+        osc2.type = 'sine'
+        
+        const startTime = ctx.currentTime + i * noteDuration
+        const isLast = i === notes.length - 1
+        const duration = isLast ? 0.35 : noteDuration * 1.5 // Let notes overlap slightly, let the last ring out
+        
+        osc1.frequency.setValueAtTime(noteFreq, startTime)
+        osc2.frequency.setValueAtTime(noteFreq * 2, startTime) // Second oscillator is an octave higher for "chime" effect
 
-      oscillator.connect(gainNode)
-      gainNode.connect(ctx.destination)
+        // Give the last note an epic shimmering pitch bend upwards
+        if (isLast) {
+          osc1.frequency.exponentialRampToValueAtTime(noteFreq * 1.25, startTime + duration)
+          osc2.frequency.exponentialRampToValueAtTime(noteFreq * 2.5, startTime + duration)
+        }
 
-      oscillator.start()
-      oscillator.stop(ctx.currentTime + 0.15)
+        gainNode.gain.setValueAtTime(0, startTime)
+        gainNode.gain.linearRampToValueAtTime(0.12, startTime + 0.01)
+        gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + duration)
+
+        osc1.connect(gainNode)
+        osc2.connect(gainNode)
+        gainNode.connect(ctx.destination)
+
+        osc1.start(startTime)
+        osc2.start(startTime)
+        osc1.stop(startTime + duration)
+        osc2.stop(startTime + duration)
+      })
     } catch (e) {
       // ignore
     }
@@ -598,19 +626,25 @@ export class GameEngine {
       const oscillator = ctx.createOscillator()
       const gainNode = ctx.createGain()
 
-      oscillator.type = 'sawtooth'
-      oscillator.frequency.setValueAtTime(150, ctx.currentTime)
-      oscillator.frequency.exponentialRampToValueAtTime(50, ctx.currentTime + 0.2)
+      // Square wave for a harsher, more thrilling "buzz" sound
+      oscillator.type = 'square'
+      
+      // Start high, drop fast, jump a bit, drop again
+      oscillator.frequency.setValueAtTime(300, ctx.currentTime)
+      oscillator.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 0.1)
+      oscillator.frequency.setValueAtTime(200, ctx.currentTime + 0.1)
+      oscillator.frequency.exponentialRampToValueAtTime(50, ctx.currentTime + 0.3)
 
       gainNode.gain.setValueAtTime(0, ctx.currentTime)
-      gainNode.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.02)
-      gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2)
+      gainNode.gain.linearRampToValueAtTime(0.2, ctx.currentTime + 0.02)
+      gainNode.gain.setValueAtTime(0.2, ctx.currentTime + 0.1)
+      gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3)
 
       oscillator.connect(gainNode)
       gainNode.connect(ctx.destination)
 
       oscillator.start()
-      oscillator.stop(ctx.currentTime + 0.2)
+      oscillator.stop(ctx.currentTime + 0.3)
     } catch (e) {
       // ignore
     }
