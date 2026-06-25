@@ -518,7 +518,7 @@ export class GameEngine {
       avoided: this.avoided,
       missed: this.missed,
       maxCombo: this.maxCombo,
-      rewardLevel: getRewardLevel(this.score),
+      rewardLevel: getRewardLevel(this.score, this.timeLimit),
     })
   }
 
@@ -884,16 +884,18 @@ function getScore(kind: GameItemKind, combo: number) {
   return 20 + bonus
 }
 
-export function getRewardLevel(score: number) {
-  if (score >= 1500) {
+export function getRewardLevel(score: number, timeLimit: number) {
+  const multiplier = timeLimit / 60
+
+  if (score >= 2500 * multiplier) {
     return 4
   }
 
-  if (score >= 1000) {
+  if (score >= 1500 * multiplier) {
     return 3
   }
 
-  if (score >= 500) {
+  if (score >= 600 * multiplier) {
     return 2
   }
 
